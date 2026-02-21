@@ -126,5 +126,5 @@ end
 -- 8. PACO SOUND COMMAND
 SLASH_PACO1 = "/paco"
 SlashCmdList["PACO"] = function()
-    PlaySoundFile("Interface\\AddOns\\LustMusic\\Media\\gaypaco.mp3", "Dialog")
+    PlaySoundFile("Interface\\AddOns\\LustMusic\\Media\\paco.mp3", "Dialog")
 end
