@@ -122,9 +122,3 @@ SlashCmdList["LUSTTEST"] = function()
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
     end
 end
-
--- 8. PACO SOUND COMMAND
-SLASH_PACO1 = "/paco"
-SlashCmdList["PACO"] = function()
-    PlaySoundFile("Interface\\AddOns\\LustMusic\\Media\\paco.mp3", "Dialog")
-end
