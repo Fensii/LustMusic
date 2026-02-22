@@ -2,7 +2,7 @@
 ## Title: Lust Music
 ## Notes: Plays a track during Bloodlust/Heroism.
 ## Author: Hekii
-## Version: 0.1
+## Version: 1.2.1
 ## SavedVariables: LustMusicPos, LustMusicSelectedSound
 
 Core.lua
