@@ -106,7 +106,7 @@ end)
 
 local testButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 testButton:SetSize(100, 25)
-testButton:SetPoint("TOPLEFT", 140, -80)
+testButton:SetPoint("TOPLEFT", 20, -110)
 testButton:SetText("Test Icon")
 testButton:SetScript("OnClick", function()
     isTestMode = not isTestMode -- Toggle the test state
