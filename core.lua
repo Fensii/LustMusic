@@ -10,14 +10,12 @@ local isTestMode = false
 local isPlaying = false
 local startTime = nil
 
---[[
-    LUST_SPELL_IDS
-    2825   Bloodlust
-    32182  Heroism
-    80353  Time Warp
-    264667 Primal Rage
-    390386 Fury of the Aspects
-]]
+-- LUST_SPELL_IDS
+-- 2825   Bloodlust
+-- 32182  Heroism
+-- 80353  Time Warp
+-- 264667 Primal Rage
+-- 390386 Fury of the Aspects
 
 -- 2. CREATE THE MAIN FRAME
 local frame = CreateFrame("Button", "LustMusicIconFrame", UIParent, "BackdropTemplate")
@@ -58,7 +56,7 @@ UIDropDownMenu_SetWidth(soundDropdown, 200)
 local function InitializeSoundDropdown()
     local info = UIDropDownMenu_CreateInfo()
     for i, sound in ipairs(availableSounds) do
-        info.text = sound
+        info.text = sound:sub(1, -5)  -- Remove .mp3 extension for display
         info.value = sound
         info.func = function(self)
             UIDropDownMenu_SetSelectedValue(soundDropdown, self.value)
@@ -109,6 +107,15 @@ closeButton:SetSize(100, 25)
 closeButton:SetPoint("BOTTOM", 0, 20)
 closeButton:SetText("Close")
 closeButton:SetScript("OnClick", function()
+    -- Stop preview if playing when closing
+    if isPreviewPlaying then
+        if settingsFrame.previewHandle then
+            StopSound(settingsFrame.previewHandle)
+            settingsFrame.previewHandle = nil
+        end
+        isPreviewPlaying = false
+        playButton:SetText("Play Preview")
+    end
     settingsFrame:Hide()
 end)
 
