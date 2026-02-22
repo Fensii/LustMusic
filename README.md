@@ -34,18 +34,51 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 - **Sound Selection**: Dropdown menu showing available sound files (without .mp3 extension).
 - **Preview Button**: Click "Play Preview" to hear the first 40 seconds of the selected sound.
 - **Stop Preview**: Click "Stop Preview" to stop playback early.
-- **Close**: Saves your selection and closes the menu.
+- **Test Icon Button**: Click "Test Icon" to show the countdown icon for positioning (replaces `/lusttest` functionality).
+- **Stop Test**: Click "Stop Test" to hide the icon.
+- **Close**: Saves your selection and closes the menu (automatically stops test mode if active).
 
 ### Test Mode (`/lusttest`)
 - Icon shows with a 40-second countdown.
 - Hold left-click to drag and reposition the icon.
 - Run `/lusttest` again to hide and lock it.
+- **Note**: Test functionality is now also available in the settings menu with the "Test Icon" button.
 
 ### Adding New Sounds
 1. Place new `.mp3` files in the `Media/` folder.
 2. Run `update_sounds.ps1` to update the addon.
 3. Reload UI with `/reload`.
 4. Use `/lustsettings` to select the new sound.
+
+## Running the PowerShell Script
+
+The `update_sounds.ps1` script updates the addon with your current sound files. Here are different ways to run it:
+
+### update Method: Command Prompt (Recommended)
+1. Open Command Prompt as Administrator
+2. Navigate to your addon folder:
+3. Right-click and select "Copy as path"on `update_sounds.ps1` in File Explorer 
+   ```
+   cd "<insert path here>"
+   ```
+4. Run the script:
+   ```
+   powershell -ExecutionPolicy Bypass -File update_sounds.ps1
+   ```
+
+### Troubleshooting
+- **Execution Policy Error**: Use `-ExecutionPolicy Bypass` or change policy with `Set-ExecutionPolicy RemoteSigned`
+- **Path Issues**: Make sure you're in the correct directory or use full paths
+- **Permission Denied**: Run as Administrator or check folder permissions
+- **Script Not Found**: Verify the file exists and has `.ps1` extension
+
+After running the script successfully, you'll see output like:
+```
+Updated availableSounds in core.lua with 3 MP3 files:
+  - file1.mp3
+  - file2.mp3
+  - file3.mp3
+```
 
 ## Supported Spells
 
@@ -57,8 +90,8 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 
 ## Commands
 
-- `/lustsettings` - Open the sound selection menu
-- `/lusttest` - Toggle test mode for positioning the icon
+- `/lustsettings` - Open the sound selection menu (includes test icon functionality)
+- `/lusttest` - Legacy command, still works but test functionality is now in settings menu
 
 ## Notes
 

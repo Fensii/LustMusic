@@ -3,8 +3,7 @@ local LUST_ID = 2825 -- Bloodlust (2825) as the primary icon
 local SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\LustMusic.mp3"
 local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true }
 local availableSounds = {
-    "01-lustra-scotty_doesnt_know-ksi.mp3",
-    "LustMusic.mp3",
+    "BlingBangBangBorn.mp3",
     "pedrolust.mp3",
 }
 local isTestMode = false
@@ -103,6 +102,37 @@ playButton:SetScript("OnClick", function()
     end
 end)
 
+local testButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
+testButton:SetSize(100, 25)
+testButton:SetPoint("TOPLEFT", 140, -80)
+testButton:SetText("Test Icon")
+testButton:SetScript("OnClick", function()
+    isTestMode = not isTestMode -- Toggle the test state
+
+    if isTestMode then
+        -- UNLOCKED & VISIBLE
+        frame:Show()
+        frame:Raise()
+        frame:SetMovable(true)
+        frame:EnableMouse(true)
+        startTime = GetTime()
+        frame:SetScript("OnUpdate", UpdateCooldown)
+        print("|cffffff00[LustMusic]:|r Test Mode ON. Icon is UNLOCKED. Drag it now!")
+        testButton:SetText("Stop Test")
+    else
+        -- LOCKED & HIDDEN
+        frame:Hide()
+        frame:SetMovable(false)
+        frame:EnableMouse(false)
+        frame:SetScript("OnUpdate", nil)
+        if frame.activeSoundHandle then StopSound(frame.activeSoundHandle) end
+        isPlaying = false
+        startTime = nil
+        print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
+        testButton:SetText("Test Icon")
+    end
+end)
+
 local closeButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 closeButton:SetSize(100, 25)
 closeButton:SetPoint("BOTTOM", 0, 20)
@@ -116,6 +146,19 @@ closeButton:SetScript("OnClick", function()
         end
         isPreviewPlaying = false
         playButton:SetText("Play Preview")
+    end
+    -- Disable test mode if active
+    if isTestMode then
+        frame:Hide()
+        frame:SetMovable(false)
+        frame:EnableMouse(false)
+        frame:SetScript("OnUpdate", nil)
+        if frame.activeSoundHandle then StopSound(frame.activeSoundHandle) end
+        isPlaying = false
+        startTime = nil
+        isTestMode = false
+        testButton:SetText("Test Icon")
+        print("|cff00ff00[LustMusic]:|r Test Mode OFF. Settings closed.")
     end
     settingsFrame:Hide()
 end)
@@ -220,3 +263,12 @@ SlashCmdList["LUSTSETTINGS"] = function()
     UIDropDownMenu_Initialize(soundDropdown, InitializeSoundDropdown)
     UIDropDownMenu_SetSelectedValue(soundDropdown, LustMusicSelectedSound or availableSounds[1])
 end
+
+
+
+
+
+
+
+
+
