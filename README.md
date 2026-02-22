@@ -1,6 +1,6 @@
 # LustMusic Addon
 
-A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) with a visual countdown icon and customizable music playback.
+A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) with a visual countdown icon and customizable music playback. Features an integrated settings interface for sound selection, preview, and icon positioning.
 
 ## Installation
 
@@ -17,11 +17,11 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 
 - **Visual Countdown**: When a lust effect is active, a movable icon appears showing a countdown from 40 to 0 seconds.
 - **Customizable Music**: Choose from multiple sound files in the `Media/` folder.
-- **Settings Interface**: Use `/lustsettings` to open a GUI for selecting sounds and previewing them.
+- **Settings Interface**: Use `/lustsettings` to open a GUI for selecting sounds, previewing them, and testing icon positioning.
 - **Sound Preview**: Test sounds with a 40-second preview that can be stopped early.
+- **Icon Positioning**: Test and reposition the countdown icon directly from the settings menu.
 - **Position Saving**: The icon's position is saved and restored between sessions.
 - **Selected Sound Persistence**: Your chosen sound file is remembered between sessions.
-- **Test Mode**: Use `/lusttest` to test the icon without needing a lust effect.
 
 ## Usage
 
@@ -38,11 +38,11 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 - **Stop Test**: Click "Stop Test" to hide the icon.
 - **Close**: Saves your selection and closes the menu (automatically stops test mode if active).
 
-### Test Mode (`/lusttest`)
+### Test Mode
 - Icon shows with a 40-second countdown.
 - Hold left-click to drag and reposition the icon.
-- Run `/lusttest` again to hide and lock it.
-- **Note**: Test functionality is now also available in the settings menu with the "Test Icon" button.
+- Use the "Test Icon" button in the settings menu to enable/disable test mode.
+- Test mode automatically disables when closing the settings window.
 
 ### Adding New Sounds
 1. Place new `.mp3` files in the `Media/` folder.
@@ -54,10 +54,10 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 
 The `update_sounds.ps1` script updates the addon with your current sound files. Here are different ways to run it:
 
-### update Method: Command Prompt (Recommended)
+### Method 1: Command Prompt (Recommended)
 1. Open Command Prompt as Administrator
 2. Navigate to your addon folder:
-3. Right-click and select "Copy as path"on `update_sounds.ps1` in File Explorer 
+3. Right-click and select "Copy as path" on `update_sounds.ps1` in File Explorer 
    ```
    cd "<insert path here>"
    ```
@@ -90,8 +90,7 @@ Updated availableSounds in core.lua with 3 MP3 files:
 
 ## Commands
 
-- `/lustsettings` - Open the sound selection menu (includes test icon functionality)
-- `/lusttest` - Legacy command, still works but test functionality is now in settings menu
+- `/lustsettings` - Open the sound selection menu (includes sound preview and icon positioning)
 
 ## Notes
 
@@ -103,4 +102,4 @@ Updated availableSounds in core.lua with 3 MP3 files:
 
 ## Version
 
-1.1</content>
+1.2</content>

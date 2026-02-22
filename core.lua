@@ -229,34 +229,7 @@ frame:SetScript("OnEvent", function(self, event)
     end
 end)
 
--- 7. LOCK/UNLOCK & TEST COMMAND
-SLASH_LUSTTEST1 = "/lusttest"
-SlashCmdList["LUSTTEST"] = function()
-    isTestMode = not isTestMode -- Toggle the test state
-
-    if isTestMode then
-        -- UNLOCKED & VISIBLE
-        frame:Show()
-        frame:Raise()
-        frame:SetMovable(true)
-        frame:EnableMouse(true)
-        startTime = GetTime()
-        frame:SetScript("OnUpdate", UpdateCooldown)
-        print("|cffffff00[LustMusic]:|r Test Mode ON. Icon is UNLOCKED. Drag it now!")
-    else
-        -- LOCKED & HIDDEN
-        frame:Hide()
-        frame:SetMovable(false)
-        frame:EnableMouse(false)
-        frame:SetScript("OnUpdate", nil)
-        if frame.activeSoundHandle then StopSound(frame.activeSoundHandle) end
-        isPlaying = false
-        startTime = nil
-        print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
-    end
-end
-
--- 8. SETTINGS COMMAND
+-- 7. SETTINGS COMMAND
 SLASH_LUSTSETTINGS1 = "/lustsettings"
 SlashCmdList["LUSTSETTINGS"] = function()
     settingsFrame:Show()
