@@ -19,9 +19,9 @@ $tableString = "local availableSounds = {`n$soundTable`n}"
 # Read the current core.lua content
 $content = Get-Content -Path $coreLuaPath -Raw
 
-# Replace the availableSounds table
-# Look for the pattern: local availableSounds = { ... }
-$pattern = "local availableSounds = \{\s*[^}]*\}"
+# Replace the availableSounds table using a more robust pattern
+# Match from "local availableSounds = {" to the closing "}"
+$pattern = "local availableSounds = \{[\s\S]*?\}"
 
 $content = $content -replace $pattern, $tableString
 

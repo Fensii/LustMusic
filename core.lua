@@ -1,8 +1,9 @@
--- 1. CONFIGURATION
+﻿-- 1. CONFIGURATION
 local LUST_ID = 2825 -- Bloodlust (2825) as the primary icon
 local SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\LustMusic.mp3"
 local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true }
 local availableSounds = {
+    "01-lustra-scotty_doesnt_know-ksi.mp3",
     "LustMusic.mp3",
     "pedrolust.mp3",
 }
