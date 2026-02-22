@@ -102,4 +102,4 @@ Updated availableSounds in core.lua with 3 MP3 files:
 
 ## Version
 
-1.2</content>
+2.0</content>

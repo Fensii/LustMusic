@@ -1,10 +1,11 @@
 ﻿-- 1. CONFIGURATION
 local LUST_ID = 2825 -- Bloodlust (2825) as the primary icon
 local SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\LustMusic.mp3"
-local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true }
+local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true, [466904]=true }
 local availableSounds = {
     "BlingBangBangBorn.mp3",
     "pedrolust.mp3",
+    "pumpit.mp3",
 }
 local isTestMode = false
 local isPlaying = false
@@ -16,6 +17,7 @@ local startTime = nil
 -- 80353  Time Warp
 -- 264667 Primal Rage
 -- 390386 Fury of the Aspects
+-- 466904 Harrier's Cry
 
 -- 2. CREATE THE MAIN FRAME
 local frame = CreateFrame("Button", "LustMusicIconFrame", UIParent, "BackdropTemplate")
