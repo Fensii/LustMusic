@@ -2,6 +2,10 @@
 local LUST_ID = 2825 -- Bloodlust (2825) as the primary icon
 local SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\LustMusic.mp3"
 local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true }
+local availableSounds = {
+    "LustMusic.mp3",
+    "pedrolust.mp3",
+}
 local isTestMode = false
 local isPlaying = false
 local startTime = nil
@@ -33,6 +37,80 @@ tex:SetTexture(C_Spell.GetSpellTexture(LUST_ID)) -- Gets the red wolf icon
 local cdText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
 cdText:SetPoint("CENTER")
 cdText:SetTextColor(1, 1, 1) -- White text
+
+-- 3.5 SETTINGS FRAME
+local settingsFrame = CreateFrame("Frame", "LustMusicSettings", UIParent, "BackdropTemplate")
+settingsFrame:SetSize(300, 200)
+settingsFrame:SetPoint("CENTER")
+settingsFrame:SetBackdrop({bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32, insets = {left = 11, right = 12, top = 12, bottom = 11}})
+settingsFrame:Hide()
+
+local isPreviewPlaying = false
+
+local title = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+title:SetPoint("TOP", 0, -16)
+title:SetText("LustMusic Settings")
+
+local soundDropdown = CreateFrame("Frame", "LustMusicSoundDropdown", settingsFrame, "UIDropDownMenuTemplate")
+soundDropdown:SetPoint("TOPLEFT", 20, -40)
+UIDropDownMenu_SetWidth(soundDropdown, 200)
+
+local function InitializeSoundDropdown()
+    local info = UIDropDownMenu_CreateInfo()
+    for i, sound in ipairs(availableSounds) do
+        info.text = sound
+        info.value = sound
+        info.func = function(self)
+            UIDropDownMenu_SetSelectedValue(soundDropdown, self.value)
+            LustMusicSelectedSound = self.value
+            SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\" .. self.value
+        end
+        info.checked = (LustMusicSelectedSound == sound)
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+local playButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
+playButton:SetSize(100, 25)
+playButton:SetPoint("TOPLEFT", 20, -80)
+playButton:SetText("Play Preview")
+playButton:SetScript("OnClick", function()
+    if isPreviewPlaying then
+        -- Stop the preview
+        if settingsFrame.previewHandle then
+            StopSound(settingsFrame.previewHandle)
+            settingsFrame.previewHandle = nil
+        end
+        isPreviewPlaying = false
+        playButton:SetText("Play Preview")
+    else
+        -- Start the preview
+        local selected = UIDropDownMenu_GetSelectedValue(soundDropdown) or availableSounds[1]
+        local soundPath = "Interface\\AddOns\\LustMusic\\Media\\" .. selected
+        local _, handle = PlaySoundFile(soundPath, "Dialog")
+        settingsFrame.previewHandle = handle
+        isPreviewPlaying = true
+        playButton:SetText("Stop Preview")
+        C_Timer.After(40, function()
+            if isPreviewPlaying then
+                if settingsFrame.previewHandle then
+                    StopSound(settingsFrame.previewHandle)
+                    settingsFrame.previewHandle = nil
+                end
+                isPreviewPlaying = false
+                playButton:SetText("Play Preview")
+            end
+        end)
+    end
+end)
+
+local closeButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
+closeButton:SetSize(100, 25)
+closeButton:SetPoint("BOTTOM", 0, 20)
+closeButton:SetText("Close")
+closeButton:SetScript("OnClick", function()
+    settingsFrame:Hide()
+end)
 
 -- 4. MAKE IT MOVABLE (Hold Left Click to Drag)
 frame:SetScript("OnDragStart", frame.StartMoving)
@@ -67,6 +145,10 @@ frame:SetScript("OnEvent", function(self, event)
             frame:ClearAllPoints()
             frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y)
         end
+        if not LustMusicSelectedSound then
+            LustMusicSelectedSound = availableSounds[1]
+        end
+        SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\" .. LustMusicSelectedSound
         return
     end
 
@@ -121,4 +203,12 @@ SlashCmdList["LUSTTEST"] = function()
         startTime = nil
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
     end
+end
+
+-- 8. SETTINGS COMMAND
+SLASH_LUSTSETTINGS1 = "/lustsettings"
+SlashCmdList["LUSTSETTINGS"] = function()
+    settingsFrame:Show()
+    UIDropDownMenu_Initialize(soundDropdown, InitializeSoundDropdown)
+    UIDropDownMenu_SetSelectedValue(soundDropdown, LustMusicSelectedSound or availableSounds[1])
 end
