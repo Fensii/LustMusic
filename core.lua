@@ -40,20 +40,37 @@ cdText:SetTextColor(1, 1, 1) -- White text
 
 -- 3.5 SETTINGS FRAME
 local settingsFrame = CreateFrame("Frame", "LustMusicSettings", UIParent, "BackdropTemplate")
-settingsFrame:SetSize(300, 200)
+settingsFrame:SetSize(350, 250)
 settingsFrame:SetPoint("CENTER")
 settingsFrame:SetBackdrop({bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32, insets = {left = 11, right = 12, top = 12, bottom = 11}})
+settingsFrame:SetMovable(true)
+settingsFrame:EnableMouse(true)
+settingsFrame:RegisterForDrag("LeftButton")
+settingsFrame:SetScript("OnDragStart", settingsFrame.StartMoving)
+settingsFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    local point, _, relativePoint, x, y = self:GetPoint()
+    LustMusicSettingsPos = { point = point, relativePoint = relativePoint, x = x, y = y }
+end)
 settingsFrame:Hide()
 
 local isPreviewPlaying = false
 
 local title = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("TOP", 0, -16)
+title:SetPoint("CENTER", settingsFrame, "TOP", 0, -16)
 title:SetText("LustMusic Settings")
+title:SetJustifyH("CENTER")
 
 local soundDropdown = CreateFrame("Frame", "LustMusicSoundDropdown", settingsFrame, "UIDropDownMenuTemplate")
-soundDropdown:SetPoint("TOPLEFT", 20, -40)
-UIDropDownMenu_SetWidth(soundDropdown, 200)
+soundDropdown:SetPoint("TOPRIGHT", -11, -40)
+UIDropDownMenu_SetWidth(soundDropdown, 140)
+soundDropdown.Text:SetJustifyH("LEFT")
+soundDropdown.Text:ClearAllPoints()
+soundDropdown.Text:SetPoint("RIGHT", soundDropdown.Button, "LEFT", 10, 0)
+
+local soundLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+soundLabel:SetPoint("RIGHT", soundDropdown, "LEFT", -5, 2)
+soundLabel:SetText("Select Sound:")
 
 local function InitializeSoundDropdown()
     local info = UIDropDownMenu_CreateInfo()
@@ -72,8 +89,13 @@ end
 
 local playButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 playButton:SetSize(100, 25)
-playButton:SetPoint("TOPLEFT", 20, -80)
-playButton:SetText("Play Preview")
+playButton:SetPoint("TOP", 0, -80)
+playButton:SetText("Play")
+
+local previewLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+previewLabel:SetPoint("RIGHT", playButton, "LEFT", -5, 0)
+previewLabel:SetText("Preview:")
+
 playButton:SetScript("OnClick", function()
     if isPreviewPlaying then
         -- Stop the preview
@@ -82,7 +104,7 @@ playButton:SetScript("OnClick", function()
             settingsFrame.previewHandle = nil
         end
         isPreviewPlaying = false
-        playButton:SetText("Play Preview")
+        playButton:SetText("Play")
     else
         -- Start the preview
         local selected = UIDropDownMenu_GetSelectedValue(soundDropdown) or availableSounds[1]
@@ -90,7 +112,7 @@ playButton:SetScript("OnClick", function()
         local _, handle = PlaySoundFile(soundPath, "Dialog")
         settingsFrame.previewHandle = handle
         isPreviewPlaying = true
-        playButton:SetText("Stop Preview")
+        playButton:SetText("Stop")
         C_Timer.After(40, function()
             if isPreviewPlaying then
                 if settingsFrame.previewHandle then
@@ -98,7 +120,7 @@ playButton:SetScript("OnClick", function()
                     settingsFrame.previewHandle = nil
                 end
                 isPreviewPlaying = false
-                playButton:SetText("Play Preview")
+                playButton:SetText("Play")
             end
         end)
     end
@@ -106,8 +128,13 @@ end)
 
 local testButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 testButton:SetSize(100, 25)
-testButton:SetPoint("TOPLEFT", 20, -110)
-testButton:SetText("Test Icon")
+testButton:SetPoint("TOP", 0, -110)
+testButton:SetText("Show Icon")
+
+local testLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+testLabel:SetPoint("RIGHT", testButton, "LEFT", -5, 0)
+testLabel:SetText("Test Icon:")
+
 testButton:SetScript("OnClick", function()
     isTestMode = not isTestMode -- Toggle the test state
 
@@ -120,7 +147,7 @@ testButton:SetScript("OnClick", function()
         startTime = GetTime()
         frame:SetScript("OnUpdate", UpdateCooldown)
         print("|cffffff00[LustMusic]:|r Test Mode ON. Icon is UNLOCKED. Drag it now!")
-        testButton:SetText("Stop Test")
+        testButton:SetText("Hide Icon")
     else
         -- LOCKED & HIDDEN
         frame:Hide()
@@ -131,13 +158,27 @@ testButton:SetScript("OnClick", function()
         isPlaying = false
         startTime = nil
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
-        testButton:SetText("Test Icon")
+        testButton:SetText("Unlock")
     end
+end)
+
+local resetButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
+resetButton:SetSize(100, 25)
+resetButton:SetPoint("TOP", 0, -140)
+resetButton:SetText("Reset Pos")
+resetButton:SetScript("OnClick", function()
+    LustMusicPos = nil
+    LustMusicSettingsPos = nil
+    frame:ClearAllPoints()
+    frame:SetPoint("CENTER")
+    settingsFrame:ClearAllPoints()
+    settingsFrame:SetPoint("CENTER")
+    print("|cff00ff00[LustMusic]:|r Positions reset to default.")
 end)
 
 local closeButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 closeButton:SetSize(100, 25)
-closeButton:SetPoint("BOTTOM", 0, 20)
+closeButton:SetPoint("BOTTOMRIGHT", -20, 20)
 closeButton:SetText("Close")
 closeButton:SetScript("OnClick", function()
     -- Stop preview if playing when closing
@@ -147,7 +188,7 @@ closeButton:SetScript("OnClick", function()
             settingsFrame.previewHandle = nil
         end
         isPreviewPlaying = false
-        playButton:SetText("Play Preview")
+        playButton:SetText("Play")
     end
     -- Disable test mode if active
     if isTestMode then
@@ -159,7 +200,7 @@ closeButton:SetScript("OnClick", function()
         isPlaying = false
         startTime = nil
         isTestMode = false
-        testButton:SetText("Test Icon")
+        testButton:SetText("Unlock")
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Settings closed.")
     end
     settingsFrame:Hide()
@@ -197,6 +238,10 @@ frame:SetScript("OnEvent", function(self, event)
         if LustMusicPos then
             frame:ClearAllPoints()
             frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y)
+        end
+        if LustMusicSettingsPos then
+            settingsFrame:ClearAllPoints()
+            settingsFrame:SetPoint(LustMusicSettingsPos.point, UIParent, LustMusicSettingsPos.relativePoint, LustMusicSettingsPos.x, LustMusicSettingsPos.y)
         end
         if not LustMusicSelectedSound then
             LustMusicSelectedSound = availableSounds[1]
@@ -238,12 +283,3 @@ SlashCmdList["LUSTSETTINGS"] = function()
     UIDropDownMenu_Initialize(soundDropdown, InitializeSoundDropdown)
     UIDropDownMenu_SetSelectedValue(soundDropdown, LustMusicSelectedSound or availableSounds[1])
 end
-
-
-
-
-
-
-
-
-
