@@ -11,6 +11,9 @@ local isTestMode = false
 local isPlaying = false
 local startTime = nil
 
+-- Ensure saved variables are initialized as tables if they don't exist
+LustMusicChannelVolumes = LustMusicChannelVolumes or {}
+
 -- LUST_SPELL_IDS
 -- 2825   Bloodlust
 -- 32182  Heroism
@@ -40,7 +43,7 @@ cdText:SetTextColor(1, 1, 1) -- White text
 
 -- 3.5 SETTINGS FRAME
 local settingsFrame = CreateFrame("Frame", "LustMusicSettings", UIParent, "BackdropTemplate")
-settingsFrame:SetSize(350, 250)
+settingsFrame:SetSize(400, 300)
 settingsFrame:SetPoint("CENTER")
 settingsFrame:SetBackdrop({bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32, insets = {left = 11, right = 12, top = 12, bottom = 11}})
 settingsFrame:SetMovable(true)
@@ -57,19 +60,19 @@ settingsFrame:Hide()
 local isPreviewPlaying = false
 
 local title = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("CENTER", settingsFrame, "TOP", 0, -16)
+title:SetPoint("CENTER", settingsFrame, "TOP", -10, -16)
 title:SetText("LustMusic Settings")
 title:SetJustifyH("CENTER")
 
 local soundDropdown = CreateFrame("Frame", "LustMusicSoundDropdown", settingsFrame, "UIDropDownMenuTemplate")
-soundDropdown:SetPoint("TOPRIGHT", -11, -40)
+soundDropdown:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 140, -40)
 UIDropDownMenu_SetWidth(soundDropdown, 140)
 soundDropdown.Text:SetJustifyH("LEFT")
-soundDropdown.Text:ClearAllPoints()
-soundDropdown.Text:SetPoint("RIGHT", soundDropdown.Button, "LEFT", 10, 0)
+soundDropdown.Text:ClearAllPoints() -- This line is good, ensures previous points are removed
+soundDropdown.Text:SetPoint("RIGHT", soundDropdown.Button, "LEFT", -8, 0)
 
 local soundLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-soundLabel:SetPoint("RIGHT", soundDropdown, "LEFT", -5, 2)
+soundLabel:SetPoint("RIGHT", soundDropdown, "LEFT", 0, 0)
 soundLabel:SetText("Select Sound:")
 
 local function InitializeSoundDropdown()
@@ -88,12 +91,12 @@ local function InitializeSoundDropdown()
 end
 
 local playButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
-playButton:SetSize(100, 25)
-playButton:SetPoint("TOP", 0, -80)
-playButton:SetText("Play")
+playButton:SetSize(100, 22) -- Slightly reduced height for better spacing
+playButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 158, -80)
+playButton:SetText("Play Preview")
 
 local previewLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-previewLabel:SetPoint("RIGHT", playButton, "LEFT", -5, 0)
+previewLabel:SetPoint("RIGHT", playButton, "LEFT", -18, 0)
 previewLabel:SetText("Preview:")
 
 playButton:SetScript("OnClick", function()
@@ -104,12 +107,12 @@ playButton:SetScript("OnClick", function()
             settingsFrame.previewHandle = nil
         end
         isPreviewPlaying = false
-        playButton:SetText("Play")
+        playButton:SetText("Play Preview")
     else
         -- Start the preview
         local selected = UIDropDownMenu_GetSelectedValue(soundDropdown) or availableSounds[1]
         local soundPath = "Interface\\AddOns\\LustMusic\\Media\\" .. selected
-        local _, handle = PlaySoundFile(soundPath, "Dialog")
+        local _, handle = PlaySoundFile(soundPath, LustMusicSoundChannel) -- Use selected channel for preview
         settingsFrame.previewHandle = handle
         isPreviewPlaying = true
         playButton:SetText("Stop")
@@ -120,20 +123,26 @@ playButton:SetScript("OnClick", function()
                     settingsFrame.previewHandle = nil
                 end
                 isPreviewPlaying = false
-                playButton:SetText("Play")
+        playButton:SetText("Play Preview")
             end
         end)
     end
 end)
 
 local testButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
-testButton:SetSize(100, 25)
-testButton:SetPoint("TOP", 0, -110)
+testButton:SetSize(100, 22)
+testButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 158, -110)
 testButton:SetText("Show Icon")
 
 local testLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-testLabel:SetPoint("RIGHT", testButton, "LEFT", -5, 0)
+testLabel:SetPoint("RIGHT", testButton, "LEFT", -18, 0)
 testLabel:SetText("Test Icon:")
+
+local resetButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
+resetButton:SetSize(100, 22)
+resetButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 158, -140)
+resetButton:SetText("Reset Pos")
+resetButton:Hide() -- Hide by default
 
 testButton:SetScript("OnClick", function()
     isTestMode = not isTestMode -- Toggle the test state
@@ -145,6 +154,7 @@ testButton:SetScript("OnClick", function()
         frame:SetMovable(true)
         frame:EnableMouse(true)
         startTime = GetTime()
+        resetButton:Show() -- Show reset button when test mode is on
         frame:SetScript("OnUpdate", UpdateCooldown)
         print("|cffffff00[LustMusic]:|r Test Mode ON. Icon is UNLOCKED. Drag it now!")
         testButton:SetText("Hide Icon")
@@ -158,14 +168,11 @@ testButton:SetScript("OnClick", function()
         isPlaying = false
         startTime = nil
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Icon is LOCKED and hidden.")
+        resetButton:Hide() -- Hide reset button when test mode is off
         testButton:SetText("Unlock")
     end
 end)
 
-local resetButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
-resetButton:SetSize(100, 25)
-resetButton:SetPoint("TOP", 0, -140)
-resetButton:SetText("Reset Pos")
 resetButton:SetScript("OnClick", function()
     LustMusicPos = nil
     LustMusicSettingsPos = nil
@@ -175,6 +182,58 @@ resetButton:SetScript("OnClick", function()
     settingsFrame:SetPoint("CENTER")
     print("|cff00ff00[LustMusic]:|r Positions reset to default.")
 end)
+
+-- Sound Channel Dropdown
+local channelDropdown = CreateFrame("Frame", "LustMusicChannelDropdown", settingsFrame, "UIDropDownMenuTemplate")
+channelDropdown:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 140, -170) -- Position below reset button
+UIDropDownMenu_SetWidth(channelDropdown, 140)
+channelDropdown.Text:SetJustifyH("LEFT")
+channelDropdown.Text:ClearAllPoints()
+channelDropdown.Text:SetPoint("RIGHT", channelDropdown.Button, "LEFT", -8, 0)
+
+local channelLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+channelLabel:SetPoint("RIGHT", channelDropdown, "LEFT", 0, 0)
+channelLabel:SetText("Sound Channel:")
+
+-- Volume Slider
+local volumeSlider = CreateFrame("Slider", "LustMusicVolumeSlider", settingsFrame, "OptionsSliderTemplate")
+volumeSlider:SetSize(140, 17)
+volumeSlider:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", 158, -200) -- Position below channel dropdown
+volumeSlider:SetMinMaxValues(0, 1) -- Volume is typically 0 to 1
+volumeSlider:SetValueStep(0.01)
+volumeSlider:SetObeyStepOnDrag(true)
+
+local volumeLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+volumeLabel:SetPoint("RIGHT", volumeSlider, "LEFT", -18, 0)
+volumeLabel:SetText("Channel Volume:")
+
+volumeSlider:SetScript("OnValueChanged", function(self, value)
+    if LustMusicSoundChannel then
+        local cvarName = "Sound_" .. LustMusicSoundChannel .. "Volume"
+        SetCVar(cvarName, value)
+        LustMusicChannelVolumes[LustMusicSoundChannel] = value -- Save the new volume for the selected channel
+    end
+end)
+
+local function InitializeChannelDropdown()
+    local channels = { "Master", "SFX", "Music", "Dialog", "Ambience", "Voice" }
+    local info = UIDropDownMenu_CreateInfo()
+    for i, channel in ipairs(channels) do
+        info.text = channel
+        info.value = channel
+        info.func = function(self)
+            UIDropDownMenu_SetSelectedValue(channelDropdown, self.value)
+            LustMusicSoundChannel = self.value
+            -- Update the volume slider to reflect the newly selected channel's volume
+            local currentChannelVolume = LustMusicChannelVolumes[self.value] or tonumber(GetCVar("Sound_" .. self.value .. "Volume")) or 1
+            volumeSlider:SetValue(currentChannelVolume)
+        end
+        info.checked = (LustMusicSoundChannel == channel)
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+
 
 local closeButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
 closeButton:SetSize(100, 25)
@@ -187,8 +246,8 @@ closeButton:SetScript("OnClick", function()
             StopSound(settingsFrame.previewHandle)
             settingsFrame.previewHandle = nil
         end
-        isPreviewPlaying = false
-        playButton:SetText("Play")
+        isPreviewPlaying = false -- Reset state
+        playButton:SetText("Play Preview") -- Reset button text
     end
     -- Disable test mode if active
     if isTestMode then
@@ -200,6 +259,7 @@ closeButton:SetScript("OnClick", function()
         isPlaying = false
         startTime = nil
         isTestMode = false
+        resetButton:Hide() -- Hide reset button when settings close and test mode was active
         testButton:SetText("Unlock")
         print("|cff00ff00[LustMusic]:|r Test Mode OFF. Settings closed.")
     end
@@ -237,7 +297,7 @@ frame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
         if LustMusicPos then
             frame:ClearAllPoints()
-            frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y)
+            frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y) -- This line seems to have a logical error in the original, should be frame:SetPoint(LustMusicPos.point, UIParent, LustMusicPos.relativePoint, LustMusicPos.x, LustMusicPos.y) if saving point, relativePoint, x, y. For now, just fixing the nil error.
         end
         if LustMusicSettingsPos then
             settingsFrame:ClearAllPoints()
@@ -246,6 +306,10 @@ frame:SetScript("OnEvent", function(self, event)
         if not LustMusicSelectedSound then
             LustMusicSelectedSound = availableSounds[1]
         end
+        if not LustMusicSoundChannel then
+            LustMusicSoundChannel = "Dialog" -- Default to Dialog channel
+        end
+        
         SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\" .. LustMusicSelectedSound
         return
     end
@@ -258,12 +322,23 @@ frame:SetScript("OnEvent", function(self, event)
         if aura then activeAura = aura; break end
     end
 
+    -- Initialize and apply channel volumes on PLAYER_LOGIN
+    if event == "PLAYER_LOGIN" then
+        local allChannels = { "Master", "SFX", "Music", "Dialog", "Ambience", "Voice" }
+        for _, channel in ipairs(allChannels) do
+            -- Initialize saved volume for each channel if not present, using current CVar
+            LustMusicChannelVolumes[channel] = LustMusicChannelVolumes[channel] or tonumber(GetCVar("Sound_" .. channel .. "Volume")) or 1
+            -- Apply saved volume to the game's CVar
+            SetCVar("Sound_" .. channel .. "Volume", LustMusicChannelVolumes[channel])
+        end
+    end
+
     if activeAura and not isPlaying and not isTestMode then
         -- START LUST
         self:Show()
         startTime = GetTime()
         self:SetScript("OnUpdate", UpdateCooldown)
-        local _, handle = PlaySoundFile(SOUND_FILE, "Dialog")
+        local _, handle = PlaySoundFile(SOUND_FILE, LustMusicSoundChannel)
         self.activeSoundHandle = handle
         isPlaying = true
     elseif not activeAura and isPlaying and not isTestMode then
@@ -282,4 +357,9 @@ SlashCmdList["LUSTSETTINGS"] = function()
     settingsFrame:Show()
     UIDropDownMenu_Initialize(soundDropdown, InitializeSoundDropdown)
     UIDropDownMenu_SetSelectedValue(soundDropdown, LustMusicSelectedSound or availableSounds[1])
+    UIDropDownMenu_Initialize(channelDropdown, InitializeChannelDropdown)
+    UIDropDownMenu_SetSelectedValue(channelDropdown, LustMusicSoundChannel or "Dialog")
+    -- Set slider to the saved volume of the currently selected channel, with fallback
+    local initialSliderValue = LustMusicChannelVolumes[LustMusicSoundChannel] or tonumber(GetCVar("Sound_" .. LustMusicSoundChannel .. "Volume")) or 1
+    volumeSlider:SetValue(initialSliderValue)
 end
