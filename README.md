@@ -18,8 +18,11 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 - **Visual Countdown**: When a lust effect is active, a movable icon appears showing a countdown from 40 to 0 seconds.
 - **Customizable Music**: Choose from multiple sound files in the `Media/` folder.
 - **Settings Interface**: Use `/lustsettings` to open a GUI for selecting sounds, previewing them, and testing icon positioning.
+- **Advanced Sound Control**: Select playback channel (Master, SFX, Music, Dialog, Ambience, Voice) and adjust its volume.
+- **Per-Channel Volume Persistence**: Volume settings are saved for each channel, ensuring your preferences are retained across game sessions.
 - **Sound Preview**: Test sounds with a 40-second preview that can be stopped early.
 - **Icon Positioning**: Test and reposition the countdown icon directly from the settings menu.
+- **Contextual UI Elements**: The "Reset Position" button now intelligently appears only when the icon is in test/movable mode, streamlining the interface.
 - **Position Saving**: The icon's position is saved and restored between sessions.
 - **Selected Sound Persistence**: Your chosen sound file is remembered between sessions.
 
@@ -28,14 +31,16 @@ A World of Warcraft addon that enhances lust effects (Bloodlust, Heroism, etc.) 
 ### Automatic Playback
 - The addon works automatically when lust effects are applied (e.g., Bloodlust, Heroism, Time Warp, etc.).
 - Icon appears, counts down, and hides when the effect ends.
-- Selected music plays for the duration of the effect.
+- Selected music plays for the duration of the effect on the chosen sound channel.
 
 ### Settings Menu (`/lustsettings`)
 - **Sound Selection**: Dropdown menu showing available sound files (without .mp3 extension).
-- **Preview Button**: Click "Play Preview" to hear the first 40 seconds of the selected sound.
-- **Stop Preview**: Click "Stop Preview" to stop playback early.
-- **Test Icon Button**: Click "Test Icon" to show the countdown icon for positioning (replaces `/lusttest` functionality).
-- **Stop Test**: Click "Stop Test" to hide the icon.
+- **Sound Channel Selection**: Dropdown to choose the sound output channel (Master, SFX, Music, Dialog, Ambience, Voice).
+- **Channel Volume Slider**: Adjusts the volume for the currently selected sound channel.
+- **Preview Button**: Click "Play Preview" to hear the first 40 seconds of the selected sound on the currently chosen channel.
+- **Stop Preview**: Click "Stop" to stop playback early.
+- **Test Icon Button**: Click "Unlock" to show the countdown icon for positioning. While unlocked, the button changes to "Hide Icon". Click "Hide Icon" to hide the icon and lock it.
+- **Reset Pos Button**: Appears when the icon is unlocked, allowing you to reset its position.
 - **Close**: Saves your selection and closes the menu (automatically stops test mode if active).
 
 ### Test Mode
