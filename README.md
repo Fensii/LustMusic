@@ -92,6 +92,8 @@ Updated availableSounds in core.lua with 3 MP3 files:
 - Time Warp (80353)
 - Primal Rage (264667)
 - Fury of the Aspects (390386)
+- Harrier's Cry (466904)
+- Drums (various versions: Deathly Ferocity, Mountain, Maelstrom, Fury, Rage)
 
 ## Commands
 
@@ -107,4 +109,4 @@ Updated availableSounds in core.lua with 3 MP3 files:
 
 ## Version
 
-0.2.1</content>
+0.2.3

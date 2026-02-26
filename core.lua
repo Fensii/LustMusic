@@ -1,7 +1,19 @@
 ﻿-- 1. CONFIGURATION
 local LUST_ID = 2825 -- Bloodlust (2825) as the primary icon
 local SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\LustMusic.mp3"
-local LUST_SPELL_IDS = { [2825]=true, [32182]=true, [80353]=true, [264667]=true, [390386]=true, [466904]=true }
+local LUST_SPELL_IDS = {
+    [2825] = true,   -- Bloodlust
+    [32182] = true,  -- Heroism
+    [80353] = true,  -- Time Warp
+    [264667] = true, -- Primal Rage
+    [390386] = true, -- Fury of the Aspects
+    [466904] = true, -- Harrier's Cry
+    [381301] = true, -- Drums of Deathly Ferocity (Dragonflight)
+    [230935] = true, -- Drums of the Mountain (Legion)
+    [256740] = true, -- Drums of the Maelstrom (BFA)
+    [178207] = true, -- Drums of Fury (WoD)
+    [146555] = true, -- Drums of Rage (MoP)
+}
 local availableSounds = {
     "BlingBangBangBorn.mp3",
     "pedrolust.mp3",
@@ -13,14 +25,6 @@ local startTime = nil
 
 -- Ensure saved variables are initialized as tables if they don't exist
 LustMusicChannelVolumes = LustMusicChannelVolumes or {}
-
--- LUST_SPELL_IDS
--- 2825   Bloodlust
--- 32182  Heroism
--- 80353  Time Warp
--- 264667 Primal Rage
--- 390386 Fury of the Aspects
--- 466904 Harrier's Cry
 
 -- 2. CREATE THE MAIN FRAME
 local frame = CreateFrame("Button", "LustMusicIconFrame", UIParent, "BackdropTemplate")
@@ -291,6 +295,7 @@ end
 
 -- 6. THE EVENT LISTENER
 frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterUnitEvent("UNIT_AURA", "player")
 
 frame:SetScript("OnEvent", function(self, event)
@@ -311,7 +316,15 @@ frame:SetScript("OnEvent", function(self, event)
         end
         
         SOUND_FILE = "Interface\\AddOns\\LustMusic\\Media\\" .. LustMusicSelectedSound
-        return
+
+        -- Initialize and apply channel volumes on PLAYER_LOGIN
+        local allChannels = { "Master", "SFX", "Music", "Dialog", "Ambience", "Voice" }
+        for _, channel in ipairs(allChannels) do
+            -- Initialize saved volume for each channel if not present, using current CVar
+            LustMusicChannelVolumes[channel] = LustMusicChannelVolumes[channel] or tonumber(GetCVar("Sound_" .. channel .. "Volume")) or 1
+            -- Apply saved volume to the game's CVar
+            SetCVar("Sound_" .. channel .. "Volume", LustMusicChannelVolumes[channel])
+        end
     end
 
     local activeAura = nil
@@ -320,17 +333,6 @@ frame:SetScript("OnEvent", function(self, event)
     for id in pairs(LUST_SPELL_IDS) do
         local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
         if aura then activeAura = aura; break end
-    end
-
-    -- Initialize and apply channel volumes on PLAYER_LOGIN
-    if event == "PLAYER_LOGIN" then
-        local allChannels = { "Master", "SFX", "Music", "Dialog", "Ambience", "Voice" }
-        for _, channel in ipairs(allChannels) do
-            -- Initialize saved volume for each channel if not present, using current CVar
-            LustMusicChannelVolumes[channel] = LustMusicChannelVolumes[channel] or tonumber(GetCVar("Sound_" .. channel .. "Volume")) or 1
-            -- Apply saved volume to the game's CVar
-            SetCVar("Sound_" .. channel .. "Volume", LustMusicChannelVolumes[channel])
-        end
     end
 
     if activeAura and not isPlaying and not isTestMode then
