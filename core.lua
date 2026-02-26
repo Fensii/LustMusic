@@ -300,9 +300,9 @@ frame:RegisterUnitEvent("UNIT_AURA", "player")
 
 frame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
-        if LustMusicPos then
+        if LustMusicPos and LustMusicPos.x and LustMusicPos.y then
             frame:ClearAllPoints()
-            frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y) -- This line seems to have a logical error in the original, should be frame:SetPoint(LustMusicPos.point, UIParent, LustMusicPos.relativePoint, LustMusicPos.x, LustMusicPos.y) if saving point, relativePoint, x, y. For now, just fixing the nil error.
+            frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", LustMusicPos.x, LustMusicPos.y)
         end
         if LustMusicSettingsPos then
             settingsFrame:ClearAllPoints()
